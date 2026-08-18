@@ -11,4 +11,11 @@ describe("topics.random procedure", () => {
     expect(topic.durationSeconds).toBe(30);
     expect(topic.suitableDurations).toContain(30);
   });
+
+  it("allows a guest caller to load an interviewer-style prompt without authentication", async () => {
+    const caller = appRouter.createCaller({} as TrpcContext);
+    const prompt = await caller.interviews.question({ category: "Product", index: 0 });
+    expect(prompt.question).toContain("user problem");
+    expect(prompt.total).toBeGreaterThanOrEqual(10);
+  });
 });

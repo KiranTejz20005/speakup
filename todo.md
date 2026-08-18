@@ -36,3 +36,6 @@
 - [x] Expand interview practice with a diverse bank of current interviewer-style HR, behavioral, technical, product, leadership, and situational questions.
 - [x] Make topical practice choices transparent in the UI, distinguishing curated, current-trend, and interviewer-prompt content.
 - [x] Add topic-source, recency, variety, and fallback regression tests; then verify the updated generator responsively.
+- [x] Remove Manus authentication redirects from all public practice CTAs and make Start practicing open the workspace directly.
+- [x] Make JAM, topic generation, Interview, and Group Discussion usable without a signed-in account while preserving graceful handling for optional saved history.
+- [x] Verify public desktop and mobile navigation never opens Manus authentication from core practice flows.

@@ -46,25 +46,25 @@ export const appRouter = router({
     snapshot: protectedProcedure.query(async ({ ctx }) => buildProgressSnapshot(await listPracticeSessions(ctx.user.id, 500))),
   }),
   recordings: router({
-    upload: protectedProcedure.input(z.object({ base64: z.string().min(8).max(22000000), contentType: z.enum(["audio/webm", "audio/ogg", "audio/wav", "audio/mpeg", "audio/mp4", "video/webm", "video/mp4"]), fileName: z.string().min(3).max(128) })).mutation(async ({ ctx, input }) => {
+    upload: publicProcedure.input(z.object({ base64: z.string().min(8).max(22000000), contentType: z.enum(["audio/webm", "audio/ogg", "audio/wav", "audio/mpeg", "audio/mp4", "video/webm", "video/mp4"]), fileName: z.string().min(3).max(128) })).mutation(async ({ ctx, input }) => {
       const bytes = Buffer.from(input.base64.replace(/^data:[^;]+;base64,/, ""), "base64");
       if (bytes.byteLength > 16 * 1024 * 1024) throw new Error("Recordings must be 16MB or smaller for transcription.");
-      return storagePut(`recordings/${ctx.user.id}/${Date.now()}-${input.fileName}`, bytes, input.contentType);
+      return storagePut(`recordings/${ctx.user?.id ?? "guest"}/${Date.now()}-${input.fileName}`, bytes, input.contentType);
     }),
-    transcribe: protectedProcedure.input(z.object({ recordingUrl: z.string().min(1).max(1024) })).mutation(({ input }) => transcribePracticeRecording(input.recordingUrl)),
+    transcribe: publicProcedure.input(z.object({ recordingUrl: z.string().min(1).max(1024) })).mutation(({ input }) => transcribePracticeRecording(input.recordingUrl)),
   }),
   feedback: router({
-    generate: protectedProcedure.input(z.object({ transcript: z.string().max(100000), topic: z.string().min(2).max(500), durationSeconds: z.number().int().min(1).max(600) })).mutation(({ input }) => generateAIFeedback(input)),
+    generate: publicProcedure.input(z.object({ transcript: z.string().max(100000), topic: z.string().min(2).max(500), durationSeconds: z.number().int().min(1).max(600) })).mutation(({ input }) => generateAIFeedback(input)),
   }),
   discussion: router({
-    reply: protectedProcedure.input(z.object({ personality: z.enum(gdPersonalities), topic: z.string().min(2).max(500), userArgument: z.string().min(2).max(8000) })).mutation(({ input }) => createDiscussionReply(input)),
-    round: protectedProcedure.input(z.object({ topic: z.string().min(2).max(500), userArgument: z.string().min(2).max(8000) })).mutation(async ({ input }) => {
+    reply: publicProcedure.input(z.object({ personality: z.enum(gdPersonalities), topic: z.string().min(2).max(500), userArgument: z.string().min(2).max(8000) })).mutation(({ input }) => createDiscussionReply(input)),
+    round: publicProcedure.input(z.object({ topic: z.string().min(2).max(500), userArgument: z.string().min(2).max(8000) })).mutation(async ({ input }) => {
       const replies = await Promise.all(gdPersonalities.map(async personality => ({ personality, content: await createDiscussionReply({ ...input, personality }) })));
       return replies;
     }),
   }),
   interviews: router({
-    question: protectedProcedure.input(z.object({ category: z.enum(interviewCategories), index: z.number().int().min(0) })).query(({ input }) => getInterviewQuestion(input.category, input.index)),
+    question: publicProcedure.input(z.object({ category: z.enum(interviewCategories), index: z.number().int().min(0) })).query(({ input }) => getInterviewQuestion(input.category, input.index)),
   }),
 });
 

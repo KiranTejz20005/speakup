@@ -4,7 +4,6 @@ import { SpeakUpShell } from "@/components/SpeakUpShell";
 import { Button } from "@/components/ui/button";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { startLogin } from "@/const";
 import { DEFAULT_PREPARATION_SECONDS, getCaptureUploadConfig, nextCountdownValue } from "@/lib/practiceCapture";
 import { trpc } from "@/lib/trpc";
 import { difficulties, topicCategories, type Difficulty, type PracticeAnalysis, type Topic, type TopicCategory } from "@shared/practice";
@@ -153,15 +152,11 @@ export default function JamPractice() {
   };
 
   const submit = async () => {
-    if (!user) {
-      startLogin();
-      return;
-    }
     if (!recorder.recordingBlob || !currentTopic) return;
     try {
       setAnalysisError(null);
       const recordingKind = captureMode === "video" ? "video" : "audio";
-      const session = await createSession.mutateAsync({
+      const session = user ? await createSession.mutateAsync({
         sessionType: isChallenge ? "challenge" : "jam",
         topic: currentTopic.text,
         category: currentTopic.category,
@@ -169,7 +164,7 @@ export default function JamPractice() {
         preparationSeconds,
         durationSeconds: sessionLength,
         recordingKind,
-      });
+      }) : undefined;
       const base64 = await blobToBase64(recorder.recordingBlob);
       const captureUpload = getCaptureUploadConfig(captureMode, recorder.recordingBlob.type);
       const saved = await upload.mutateAsync({ base64, ...captureUpload });
