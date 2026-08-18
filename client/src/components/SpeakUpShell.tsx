@@ -1,0 +1,47 @@
+import { BrandMark } from "@/components/BrandMark";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/_core/hooks/useAuth";
+import { startLogin } from "@/const";
+import { useTheme } from "@/contexts/ThemeContext";
+import { LogOut, Menu, Moon, Sun, X } from "lucide-react";
+import { useState } from "react";
+import { Link, useLocation } from "wouter";
+
+const navigation = [
+  { label: "Practice", href: "/app" },
+  { label: "JAM", href: "/jam" },
+  { label: "Group Discussion", href: "/discussion" },
+  { label: "History", href: "/history" },
+  { label: "Progress", href: "/progress" },
+];
+
+export function ThemeButton() {
+  const { theme, toggleTheme } = useTheme();
+  return <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Toggle light and dark theme" className="rounded-full text-muted-foreground hover:bg-muted"><Sun className="h-4 w-4 dark:hidden" /><Moon className="hidden h-4 w-4 dark:block" /></Button>;
+}
+
+export function SpeakUpShell({ children, publicOnly = false }: { children: React.ReactNode; publicOnly?: boolean }) {
+  const { user, loading, logout } = useAuth();
+  const [location] = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <div className="min-h-screen overflow-x-clip bg-background text-foreground">
+      <header className="sticky top-0 z-50 border-b border-border/70 bg-background/80 backdrop-blur-xl">
+        <div className="app-container flex h-[72px] items-center justify-between gap-4">
+          <Link href="/" aria-label="SpeakUp home"><BrandMark /></Link>
+          {!publicOnly && <nav className="hidden items-center gap-1 lg:flex" aria-label="Practice navigation">
+            {navigation.map(item => <Link key={item.href} href={item.href} className={`nav-link ${location === item.href ? "is-active" : ""}`}>{item.label}</Link>)}
+          </nav>}
+          <div className="hidden items-center gap-2 sm:flex">
+            <ThemeButton />
+            {!loading && (user ? <Button variant="ghost" onClick={logout} className="gap-2 rounded-full px-3 text-muted-foreground hover:text-foreground"><span className="grid h-6 w-6 place-items-center rounded-full bg-slate-900 text-[10px] font-semibold text-white dark:bg-white dark:text-slate-950">{user.name?.slice(0, 1).toUpperCase() || "U"}</span><span className="max-w-24 truncate text-sm">{user.name?.split(" ")[0] || "Account"}</span><LogOut className="h-3.5 w-3.5" /></Button> : <><Button variant="ghost" onClick={() => startLogin()} className="rounded-full">Log in</Button><Button onClick={() => startLogin()} className="rounded-full px-5">Start practicing</Button></>)}
+          </div>
+          <div className="flex items-center gap-1 sm:hidden"><ThemeButton /><Button variant="ghost" size="icon" className="rounded-full" onClick={() => setMenuOpen(open => !open)} aria-label="Open navigation">{menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</Button></div>
+        </div>
+        {menuOpen && <div className="border-t border-border bg-background px-5 py-4 sm:hidden"><nav className="grid gap-1">{navigation.map(item => <Link onClick={() => setMenuOpen(false)} key={item.href} href={item.href} className={`rounded-xl px-3 py-3 text-sm font-medium ${location === item.href ? "bg-muted" : ""}`}>{item.label}</Link>)}<Button onClick={() => startLogin()} className="mt-2 rounded-xl">Start practicing</Button></nav></div>}
+      </header>
+      {children}
+    </div>
+  );
+}

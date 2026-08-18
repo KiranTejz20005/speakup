@@ -1,0 +1,22 @@
+# Project TODO
+
+- [x] Establish SpeakUp’s responsive premium visual system, public landing page, authentication CTAs, navigation, and switchable dark/light theme.
+- [x] Design and migrate the practice-session, transcript, score, recording metadata, and saved-topic data models.
+- [x] Implement a reusable topic catalogue and generation service with category, difficulty, and duration filtering.
+- [x] Build the interactive practice dashboard with functional navigation and quick-start cards for JAM, group discussion, interviews, and random challenges.
+- [x] Build the exact JAM flow: category and difficulty selection, 10-second preparation state, and 60-second immersive countdown session.
+- [x] Implement browser microphone recording with MediaRecorder and live Web Audio analyser waveform, plus pause, resume, stop, replay, and automatic stop on timer expiry.
+- [x] Build the recording review screen with playback-speed control, transcript display, filler-word highlighting, five exact performance dimensions, constructive feedback, and a suggested speech structure.
+- [x] Create clean server-side service abstractions for Whisper transcription, AI feedback, topic generation, interview prompts, and GD participant responses.
+- [x] Build the group-discussion simulator with the exact personalities Logical, Aggressive, Balanced, Data-driven, and Contrarian.
+- [x] Build interview practice for HR, Behavioral, and Technical categories with sequential voice-answer recording.
+- [x] Persist session metadata and feedback, and build a history page with full-analysis and recording replay access.
+- [x] Build the progress dashboard with animated performance charts and the required achievement badges: JAM Master, GD Starter, and Consistent Speaker.
+- [x] Add Vitest coverage for topic selection, scoring feedback generation, and session API procedures.
+- [x] Verify the application on desktop and mobile, resolve errors, and save a final project checkpoint.
+- [x] Add real routes for every visible practice navigation destination and verify no CTA leads to a missing screen.
+- [x] Add an explicit landing-page Progress section without fabricated user metrics or testimonials.
+- [x] Add duration filtering to the topic service and generator UI rather than using only a fixed 60-second challenge.
+- [x] Expose all topic categories in the JAM setup screen.
+- [x] Upgrade group discussion into a multi-participant flow with contribution tracking and a final GD performance report.
+- [x] Add authenticated success and unauthorized Vitest coverage for session creation, listing, lookup, and completion procedures.

@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertPracticeSession, InsertUser, practiceSessions, savedTopics, users } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,36 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+export async function createPracticeSession(session: InsertPracticeSession) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+  const result = await db.insert(practiceSessions).values(session);
+  const id = Number(result[0].insertId);
+  return getPracticeSession(session.userId, id);
+}
+
+export async function getPracticeSession(userId: number, sessionId: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  const result = await db.select().from(practiceSessions).where(and(eq(practiceSessions.userId, userId), eq(practiceSessions.id, sessionId))).limit(1);
+  return result[0];
+}
+
+export async function listPracticeSessions(userId: number, limit = 30) {
+  const db = await getDb();
+  if (!db) return [];
+  return db.select().from(practiceSessions).where(eq(practiceSessions.userId, userId)).orderBy(desc(practiceSessions.createdAt)).limit(limit);
+}
+
+export async function updatePracticeSession(userId: number, sessionId: number, values: Partial<Omit<InsertPracticeSession, "id" | "userId" | "createdAt">>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+  await db.update(practiceSessions).set({ ...values, updatedAt: new Date() }).where(and(eq(practiceSessions.userId, userId), eq(practiceSessions.id, sessionId)));
+  return getPracticeSession(userId, sessionId);
+}
+
+export async function savePracticeTopic(userId: number, topic: string, category: string, difficulty: string, durationSeconds = 60) {
+  const db = await getDb();
+  if (!db) throw new Error("Database is unavailable");
+  await db.insert(savedTopics).values({ userId, topic, category, difficulty, durationSeconds });
+}
