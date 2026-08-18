@@ -31,3 +31,8 @@
 - [x] Add the same optional Camera + Voice recording control and video persistence flow to Interview and Group Discussion practice.
 - [x] Add a synchronized remaining-time overlay to video playback and verify its behavior during play, pause, seek, and completion.
 - [x] Add regression coverage and desktop/mobile visual verification for the repaired timers, text visibility, video capture modes, and playback overlay.
+- [x] Add a substantially broader curated catalogue across education, technology, society, business, career, culture, sustainability, and current affairs.
+- [x] Add a current-trends topic service backed by reliable public news data with an explicit unavailable-data fallback.
+- [x] Expand interview practice with a diverse bank of current interviewer-style HR, behavioral, technical, product, leadership, and situational questions.
+- [x] Make topical practice choices transparent in the UI, distinguishing curated, current-trend, and interviewer-prompt content.
+- [x] Add topic-source, recency, variety, and fallback regression tests; then verify the updated generator responsively.

@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { Link } from "wouter";
 
 async function blobToBase64(blob: Blob) { return new Promise<string>((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result)); reader.onerror = () => reject(reader.error); reader.readAsDataURL(blob); }); }
-const categories: { label: InterviewCategory; detail: string }[] = [{ label: "HR", detail: "Strengths, motivation, and career direction" }, { label: "Behavioral", detail: "Experiences that show how you work" }, { label: "Technical", detail: "Web Development, AI/ML, Database, Programming, and Networks" }];
+const categories: { label: InterviewCategory; detail: string }[] = [{ label: "HR", detail: "Strengths, motivation, and career direction" }, { label: "Behavioral", detail: "Experiences that show how you work" }, { label: "Technical", detail: "Web Development, AI/ML, Database, Programming, and Networks" }, { label: "Product", detail: "Customer problems, experiments, and trade-offs" }, { label: "Leadership", detail: "Alignment, trust, and accountability" }, { label: "Situational", detail: "Clear thinking under realistic pressure" }];
 
 function InterviewWorkspace() {
   const { user } = useAuth(); const [category, setCategory] = useState<InterviewCategory>("HR"); const [questionIndex, setQuestionIndex] = useState(0); const [captureMode, setCaptureMode] = useState<CaptureMode>("audio"); const [analysis, setAnalysis] = useState<PracticeAnalysis | null>(null); const [transcript, setTranscript] = useState(""); const [error, setError] = useState<string | null>(null);

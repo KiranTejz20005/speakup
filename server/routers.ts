@@ -1,5 +1,5 @@
 import { COOKIE_NAME } from "@shared/const";
-import { difficulties, gdPersonalities, interviewCategories, topicCategories } from "@shared/practice";
+import { difficulties, gdPersonalities, interviewCategories, topicCategories, topicSources } from "@shared/practice";
 import { z } from "zod";
 import { createPracticeSession, getPracticeSession, listPracticeSessions, savePracticeTopic, updatePracticeSession } from "./db";
 import { getSessionCookieOptions } from "./_core/cookies";
@@ -9,7 +9,7 @@ import { createDiscussionReply } from "./services/discussion";
 import { generateAIFeedback } from "./services/feedback";
 import { getInterviewQuestion } from "./services/interview";
 import { buildProgressSnapshot } from "./services/progress";
-import { getRandomTopic } from "./services/topics";
+import { getPracticeTopic } from "./services/topics";
 import { transcribePracticeRecording } from "./services/transcription";
 import { storagePut } from "./storage";
 
@@ -27,7 +27,7 @@ export const appRouter = router({
     }),
   }),
   topics: router({
-    random: publicProcedure.input(z.object({ category: z.enum(topicCategories).default("Random"), difficulty: z.enum(difficulties).optional(), durationSeconds: z.union([z.literal(30), z.literal(60), z.literal(90)]).default(60) })).query(({ input }) => getRandomTopic(input.category, input.difficulty, input.durationSeconds)),
+    random: publicProcedure.input(z.object({ source: z.enum(topicSources).default("curated"), category: z.enum(topicCategories).default("Random"), difficulty: z.enum(difficulties).optional(), durationSeconds: z.union([z.literal(30), z.literal(60), z.literal(90)]).default(60) })).query(({ input }) => getPracticeTopic(input.source, input.category, input.difficulty, input.durationSeconds)),
     save: protectedProcedure.input(z.object({ topic: z.string().min(2).max(500), category: z.enum(topicCategories), difficulty: z.enum(difficulties), durationSeconds: z.number().int().min(15).max(600).default(60) })).mutation(async ({ ctx, input }) => {
       await savePracticeTopic(ctx.user.id, input.topic, input.category, input.difficulty, input.durationSeconds);
       return { success: true };
