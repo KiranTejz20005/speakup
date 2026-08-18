@@ -35,8 +35,8 @@ describe("sessions procedures", () => {
   it("creates a session for the authenticated user", async () => {
     db.createPracticeSession.mockResolvedValue({ id: 9, userId: user.id, topic: "Should AI replace teachers?" });
     const caller = appRouter.createCaller(context());
-    const result = await caller.sessions.create({ sessionType: "jam", topic: "Should AI replace teachers?", category: "Education", difficulty: "Medium", durationSeconds: 60 });
-    expect(db.createPracticeSession).toHaveBeenCalledWith(expect.objectContaining({ userId: 42, sessionType: "jam", durationSeconds: 60 }));
+    const result = await caller.sessions.create({ sessionType: "jam", topic: "Should AI replace teachers?", category: "Education", difficulty: "Medium", preparationSeconds: 30, durationSeconds: 60, recordingKind: "video" });
+    expect(db.createPracticeSession).toHaveBeenCalledWith(expect.objectContaining({ userId: 42, sessionType: "jam", preparationSeconds: 30, durationSeconds: 60, recordingKind: "video" }));
     expect(result).toMatchObject({ id: 9, userId: 42 });
   });
 
@@ -53,8 +53,8 @@ describe("sessions procedures", () => {
   it("completes a session with persisted recording and analysis metadata", async () => {
     db.updatePracticeSession.mockResolvedValue({ id: 3, status: "complete", overallScore: 84 });
     const caller = appRouter.createCaller(context());
-    const result = await caller.sessions.complete({ sessionId: 3, overallScore: 84, recordingKey: "recordings/42/answer.webm", recordingUrl: "/manus-storage/answer.webm", transcript: "My response", analysisJson: "{}" });
-    expect(db.updatePracticeSession).toHaveBeenCalledWith(42, 3, expect.objectContaining({ status: "complete", overallScore: 84, transcript: "My response" }));
+    const result = await caller.sessions.complete({ sessionId: 3, overallScore: 84, recordingKind: "video", recordingMimeType: "video/webm", recordingKey: "recordings/42/answer.webm", recordingUrl: "/manus-storage/answer.webm", transcript: "My response", analysisJson: "{}" });
+    expect(db.updatePracticeSession).toHaveBeenCalledWith(42, 3, expect.objectContaining({ status: "complete", overallScore: 84, recordingKind: "video", recordingMimeType: "video/webm", transcript: "My response" }));
     expect(result).toMatchObject({ id: 3, status: "complete" });
   });
 

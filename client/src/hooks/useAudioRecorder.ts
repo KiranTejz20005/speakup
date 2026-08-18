@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 export type RecorderStatus = "idle" | "requesting" | "recording" | "paused" | "stopped" | "error";
 
-export function useAudioRecorder() {
+export function useAudioRecorder({ withVideo = false }: { withVideo?: boolean } = {}) {
   const [status, setStatus] = useState<RecorderStatus>("idle");
   const [recordingUrl, setRecordingUrl] = useState<string | null>(null);
   const [recordingBlob, setRecordingBlob] = useState<Blob | null>(null);
+  const [previewStream, setPreviewStream] = useState<MediaStream | null>(null);
   const [levels, setLevels] = useState<number[]>(Array(28).fill(0.12));
   const [error, setError] = useState<string | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -21,6 +22,7 @@ export function useAudioRecorder() {
     contextRef.current = null;
     streamRef.current?.getTracks().forEach(track => track.stop());
     streamRef.current = null;
+    setPreviewStream(null);
   }, []);
 
   const start = useCallback(async () => {
@@ -32,8 +34,12 @@ export function useAudioRecorder() {
     try {
       setError(null);
       setStatus("requesting");
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+        video: withVideo ? { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } } : false,
+      });
       streamRef.current = stream;
+      setPreviewStream(stream);
       const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (AudioContextClass) {
         const context = new AudioContextClass();
@@ -55,8 +61,9 @@ export function useAudioRecorder() {
         };
         draw();
       }
-      const mimeType = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
-      const recorder = new MediaRecorder(stream, { mimeType });
+      const preferredMimeTypes = withVideo ? ["video/webm;codecs=vp8,opus", "video/webm"] : ["audio/webm;codecs=opus", "audio/webm"];
+      const mimeType = preferredMimeTypes.find(candidate => MediaRecorder.isTypeSupported(candidate)) || "";
+      const recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
       recorderRef.current = recorder;
       chunksRef.current = [];
       recorder.ondataavailable = event => { if (event.data.size) chunksRef.current.push(event.data); };
@@ -78,7 +85,7 @@ export function useAudioRecorder() {
       setStatus("error");
       return false;
     }
-  }, [closeAudio]);
+  }, [closeAudio, withVideo]);
 
   const pause = useCallback(() => {
     if (recorderRef.current?.state === "recording") { recorderRef.current.pause(); setStatus("paused"); }
@@ -99,5 +106,5 @@ export function useAudioRecorder() {
   }, [stop]);
 
   useEffect(() => () => { closeAudio(); if (recordingUrl) URL.revokeObjectURL(recordingUrl); }, [closeAudio, recordingUrl]);
-  return { status, recordingUrl, recordingBlob, levels, error, start, pause, resume, stop, reset };
+  return { status, recordingUrl, recordingBlob, previewStream, levels, error, start, pause, resume, stop, reset, withVideo };
 }

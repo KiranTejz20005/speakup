@@ -1,0 +1,15 @@
+import { describe, expect, it } from "vitest";
+import { DEFAULT_PREPARATION_SECONDS, getCaptureUploadConfig, preparationDurationOptions, speakingDurationOptions } from "./practiceCapture";
+
+describe("practice capture settings", () => {
+  it("uses a 30-second preparation phase by default and exposes adjustable timing choices", () => {
+    expect(DEFAULT_PREPARATION_SECONDS).toBe(30);
+    expect(preparationDurationOptions).toContain(30);
+    expect(speakingDurationOptions).toEqual([30, 60, 90, 120]);
+  });
+
+  it("uses a video WebM upload when camera mode is selected while preserving audio-only uploads", () => {
+    expect(getCaptureUploadConfig("video", "video/webm;codecs=vp8,opus")).toEqual({ contentType: "video/webm", fileName: "jam-video-response.webm" });
+    expect(getCaptureUploadConfig("audio", "audio/ogg;codecs=opus")).toEqual({ contentType: "audio/ogg", fileName: "jam-voice-response.webm" });
+  });
+});

@@ -36,8 +36,8 @@ export const appRouter = router({
   sessions: router({
     list: protectedProcedure.query(({ ctx }) => listPracticeSessions(ctx.user.id)),
     detail: protectedProcedure.input(z.object({ sessionId: z.number().int().positive() })).query(({ ctx, input }) => getPracticeSession(ctx.user.id, input.sessionId)),
-    create: protectedProcedure.input(z.object({ sessionType: z.enum(["jam", "gd", "interview", "challenge"]), topic: z.string().min(2).max(500), category: z.string().min(2).max(64), difficulty: z.string().min(2).max(16), durationSeconds: z.number().int().min(15).max(600).default(60) })).mutation(({ ctx, input }) => createPracticeSession({ ...input, userId: ctx.user.id })),
-    complete: protectedProcedure.input(z.object({ sessionId: z.number().int().positive(), overallScore: z.number().int().min(0).max(100).optional(), recordingKey: z.string().max(512).optional(), recordingUrl: z.string().max(1024).optional(), transcript: z.string().max(100000).optional(), analysisJson: z.string().max(120000).optional() })).mutation(({ ctx, input }) => {
+    create: protectedProcedure.input(z.object({ sessionType: z.enum(["jam", "gd", "interview", "challenge"]), topic: z.string().min(2).max(500), category: z.string().min(2).max(64), difficulty: z.string().min(2).max(16), preparationSeconds: z.number().int().min(0).max(300).default(30), durationSeconds: z.number().int().min(15).max(600).default(60), recordingKind: z.enum(["audio", "video"]).default("audio") })).mutation(({ ctx, input }) => createPracticeSession({ ...input, userId: ctx.user.id })),
+    complete: protectedProcedure.input(z.object({ sessionId: z.number().int().positive(), overallScore: z.number().int().min(0).max(100).optional(), recordingKind: z.enum(["audio", "video"]).optional(), recordingMimeType: z.string().max(128).optional(), recordingKey: z.string().max(512).optional(), recordingUrl: z.string().max(1024).optional(), transcript: z.string().max(100000).optional(), analysisJson: z.string().max(120000).optional() })).mutation(({ ctx, input }) => {
       const { sessionId, ...values } = input;
       return updatePracticeSession(ctx.user.id, sessionId, { ...values, status: "complete" });
     }),
@@ -46,7 +46,7 @@ export const appRouter = router({
     snapshot: protectedProcedure.query(async ({ ctx }) => buildProgressSnapshot(await listPracticeSessions(ctx.user.id, 500))),
   }),
   recordings: router({
-    upload: protectedProcedure.input(z.object({ base64: z.string().min(8).max(22000000), contentType: z.enum(["audio/webm", "audio/ogg", "audio/wav", "audio/mpeg", "audio/mp4"]), fileName: z.string().min(3).max(128) })).mutation(async ({ ctx, input }) => {
+    upload: protectedProcedure.input(z.object({ base64: z.string().min(8).max(22000000), contentType: z.enum(["audio/webm", "audio/ogg", "audio/wav", "audio/mpeg", "audio/mp4", "video/webm", "video/mp4"]), fileName: z.string().min(3).max(128) })).mutation(async ({ ctx, input }) => {
       const bytes = Buffer.from(input.base64.replace(/^data:[^;]+;base64,/, ""), "base64");
       if (bytes.byteLength > 16 * 1024 * 1024) throw new Error("Recordings must be 16MB or smaller for transcription.");
       return storagePut(`recordings/${ctx.user.id}/${Date.now()}-${input.fileName}`, bytes, input.contentType);

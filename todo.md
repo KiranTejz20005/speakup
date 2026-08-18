@@ -20,3 +20,9 @@
 - [x] Expose all topic categories in the JAM setup screen.
 - [x] Upgrade group discussion into a multi-participant flow with contribution tracking and a final GD performance report.
 - [x] Add authenticated success and unauthorized Vitest coverage for session creation, listing, lookup, and completion procedures.
+- [x] Add optional browser camera capture alongside microphone recording, with a clear privacy and permission state.
+- [x] Add a user-controlled capture mode and timing controls with 30-second preparation default plus configurable preparation and speaking durations.
+- [x] Extend recording review to play saved video, present body-language coaching guidance, and retain transcripts for both voice and video recordings.
+- [x] Persist video metadata securely alongside existing recording and transcript fields, and update history and detail views accordingly.
+- [x] Add automated coverage and responsive visual verification for optional video capture and configurable practice timing.
+- [x] Add focused automated coverage for the 30-second default, adjustable timing choices, and video upload configuration.
