@@ -17,5 +17,6 @@ describe("RecordingReview video mode", () => {
     expect(markup).toContain("<video");
     expect(markup).toContain("Body-language review cues");
     expect(markup).toContain("Playback speed");
+    expect(markup).toContain("Loading timer…");
   });
 });

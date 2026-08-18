@@ -11,3 +11,12 @@ export function getCaptureUploadConfig(mode: CaptureMode, blobType: string) {
     fileName: "jam-voice-response.webm",
   };
 }
+
+export function nextCountdownValue(value: number) {
+  return Math.max(0, value - 1);
+}
+
+export function formatRemainingPlaybackTime(duration: number, currentTime: number) {
+  const remaining = Math.max(0, duration - currentTime);
+  return `${Math.floor(remaining / 60)}:${String(Math.floor(remaining % 60)).padStart(2, "0")}`;
+}

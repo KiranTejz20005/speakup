@@ -26,3 +26,8 @@
 - [x] Persist video metadata securely alongside existing recording and transcript fields, and update history and detail views accordingly.
 - [x] Add automated coverage and responsive visual verification for optional video capture and configurable practice timing.
 - [x] Add focused automated coverage for the 30-second default, adjustable timing choices, and video upload configuration.
+- [x] Repair the JAM countdown lifecycle so it advances reliably, pauses correctly, and auto-stops the capture exactly at expiry.
+- [x] Correct low-contrast and misplaced text in the timer and random-topic action areas, including narrow layouts.
+- [x] Add the same optional Camera + Voice recording control and video persistence flow to Interview and Group Discussion practice.
+- [x] Add a synchronized remaining-time overlay to video playback and verify its behavior during play, pause, seek, and completion.
+- [x] Add regression coverage and desktop/mobile visual verification for the repaired timers, text visibility, video capture modes, and playback overlay.
